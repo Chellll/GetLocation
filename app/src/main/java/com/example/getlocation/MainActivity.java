@@ -39,6 +39,7 @@ import com.google.android.gms.tasks.Task;
 
 import com.example.getlocation.Model.Explore;
 import com.example.getlocation.Model.Item_;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,11 +78,6 @@ public class MainActivity extends AppCompatActivity{
     FusedLocationProviderClient mFusedLocationClient;
 
 
-
-    private TextView mLatitudeText;
-    private TextView mLongitudeText;
-
-
     double lat = 57.9989369;
     double lng = 56.2853801;
 
@@ -91,41 +87,8 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        etGeolocation = (EditText) findViewById(R.id.et_geolocation);
-        etQuery = (EditText) findViewById(R.id.et_query);
-        btnSearch = (Button) findViewById(R.id.btn_search);
         listView = (ListView)findViewById(R.id.listivew);
         btn_getLocation = (Button) findViewById(R.id.getLocation);
-
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                ExploreAsyncTask exploreAsyncTask = new ExploreAsyncTask();
-                exploreAsyncTask.execute();
-
-
-            }
-//				ExploreAsyncTask exploreAsyncTask = new ExploreAsyncTask();
-//				exploreAsyncTask.execute();
-/*
-                FourSquareService fourSquareService = FourSquareService.retrofit.create(FourSquareService.class);
-                final Call<Explore> call = fourSquareService.requestExplore(Client_ID, Client_Secret, apiVersion, geoLocation, query);
-                call.enqueue(new Callback<Explore>() {
-                    @Override
-                    public void onResponse(Call<Explore> call, Response<Explore> response) {
-                        item_list = response.body().getResponse().getGroups().get(0).getItems();
-                        ExploreListAdapter exploreListAdapter = new ExploreListAdapter(getApplicationContext(), R.layout.item_list, item_list);
-                        listView.setAdapter(exploreListAdapter);
-                    }
-
-                    @Override
-                    public void onFailure(Call<Explore> call, Throwable t) {
-
-                    }
-                });*/
-
-        });
 
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
