@@ -93,9 +93,6 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
-    /**
-     * Return the current state of the permissions needed.
-     */
     private boolean checkPermissions() {
         int permissionState = ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
