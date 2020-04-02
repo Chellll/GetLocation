@@ -17,31 +17,55 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+//
+import com.example.getlocation.Model.Category;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import com.example.getlocation.Model.Explore;
+import com.example.getlocation.Model.Item_;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity{
 
-    private LocationManager mLocationManager;
-    private LocationListener mLocationListener;
-    private Location mLocation;
+    EditText etGeolocation, etQuery;
+    Button btnSearch, btn_getLocation;
+    ListView listView;
+    String Client_ID = "VIEQ0QX5GAJ1XLDJABA5WBS54XCVTNWLNY2NLAZVNB2ZDUYM";
+    String Client_Secret = "COARL4531NXUEZTWDE21201TRAZXPEFIQKXFY4AJKHWHDXOT";
+    String apiVersion = "20161010";
+    String geoLocation = "55.808806,49.185879";
+    String query = "";
+
+    List<Item_> item_list = new ArrayList<>();
+
+    private LocationCallback mLocationCallback;
 
     /**
      * Represents a geographical location.
@@ -58,9 +82,6 @@ public class MainActivity extends AppCompatActivity{
     private TextView mLongitudeText;
 
 
-    Button btn_getLocation;
-
-
     double lat = 57.9989369;
     double lng = 56.2853801;
 
@@ -70,12 +91,44 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-
+        etGeolocation = (EditText) findViewById(R.id.et_geolocation);
+        etQuery = (EditText) findViewById(R.id.et_query);
+        btnSearch = (Button) findViewById(R.id.btn_search);
+        listView = (ListView)findViewById(R.id.listivew);
         btn_getLocation = (Button) findViewById(R.id.getLocation);
-        mLatitudeText = (TextView) findViewById((R.id.textViewLatitude));
-        mLongitudeText = (TextView) findViewById((R.id.textViewLongitude));
+
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                ExploreAsyncTask exploreAsyncTask = new ExploreAsyncTask();
+                exploreAsyncTask.execute();
+
+
+            }
+//				ExploreAsyncTask exploreAsyncTask = new ExploreAsyncTask();
+//				exploreAsyncTask.execute();
+/*
+                FourSquareService fourSquareService = FourSquareService.retrofit.create(FourSquareService.class);
+                final Call<Explore> call = fourSquareService.requestExplore(Client_ID, Client_Secret, apiVersion, geoLocation, query);
+                call.enqueue(new Callback<Explore>() {
+                    @Override
+                    public void onResponse(Call<Explore> call, Response<Explore> response) {
+                        item_list = response.body().getResponse().getGroups().get(0).getItems();
+                        ExploreListAdapter exploreListAdapter = new ExploreListAdapter(getApplicationContext(), R.layout.item_list, item_list);
+                        listView.setAdapter(exploreListAdapter);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Explore> call, Throwable t) {
+
+                    }
+                });*/
+
+        });
+
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 
         btn_getLocation.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +140,9 @@ public class MainActivity extends AppCompatActivity{
                 } else {
                     getLastLocation();
                 }
+
+                ExploreAsyncTask exploreAsyncTask = new ExploreAsyncTask();
+                exploreAsyncTask.execute();
 
             }
         });
@@ -103,25 +159,20 @@ public class MainActivity extends AppCompatActivity{
     //получение координат
     @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
-        mFusedLocationClient.getLastLocation()
-                .addOnCompleteListener(this, new OnCompleteListener<Location>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Location> task) {
-                        if (task.isSuccessful() && task.getResult() != null) {
 
-                            mLastLocation = task.getResult();
+        SettingsClient client = LocationServices.getSettingsClient(this);
 
-                            mLatitudeText.setText("Latitude : "+
-                                    mLastLocation.getLatitude() + "");
-                            mLongitudeText.setText("Longitude : "+
-                                    mLastLocation.getLongitude() + "");
-                        } else {
+        mLocationCallback = new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
 
-                            showMessage("No Location found");
+                Location mCurrentLocation = locationResult.getLocations().get(0);
+                geoLocation = String.valueOf(mCurrentLocation.getLatitude()) + "," + String.valueOf(mCurrentLocation.getLongitude());
+            }
+        };
 
-                        }
-                    }
-                });
+
     }
 
     public void showMessage(String message) {
@@ -167,4 +218,43 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-}
+    public class ExploreAsyncTask extends AsyncTask<Void,Void,List<Item_>> {
+
+        List<Category> mCategories = new ArrayList<>();
+
+        public ExploreAsyncTask() {
+            super();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<Item_> doInBackground(Void... voids) {
+            FourSquareService fourSquareService = FourSquareService.retrofit.create(FourSquareService.class);
+            final Call<Explore> call = fourSquareService.requestExplore(Client_ID, Client_Secret, apiVersion, geoLocation, query);
+
+            try {
+                Explore explore =  call.execute().body();
+                item_list = explore.getResponse().getGroups().get(0).getItems();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return item_list;
+        }
+
+        @Override
+        protected void onPostExecute(List<Item_> item_s) {
+            super.onPostExecute(item_s);
+            ExploreListAdapter exploreListAdapter = new ExploreListAdapter(getApplicationContext(), R.layout.item_list, item_s);
+            listView.setAdapter(exploreListAdapter);
+        }
+    }
+
+
+            }
+
