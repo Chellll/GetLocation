@@ -33,6 +33,10 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.material:material:1.2.0-alpha05'
 
+    //glide library
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+
 // This is for
     compileOnly 'org.glassfish:javax.annotation:10.0-b28'
 

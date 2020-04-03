@@ -10,7 +10,7 @@
     android:paddingRight="24dp"
     android:paddingTop="24dp"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".view.ui.MainActivity">
 
     <Button
         android:id="@+id/getLocation"
