@@ -24,15 +24,15 @@ import com.example.getlocation.BuildConfig;
 import com.example.getlocation.view.adapter.ExploreListAdapter;
 import com.example.getlocation.FourSquareService;
 import com.example.getlocation.R;
-import com.example.getlocation.service.models.api.Category;
+import com.example.getlocation.data.models.api.Category;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.SettingsClient;
 
-import com.example.getlocation.service.models.api.Explore;
-import com.example.getlocation.service.models.api.Item_;
+import com.example.getlocation.data.models.api.Explore;
+import com.example.getlocation.data.models.api.Item_;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,7 +73,13 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+/*
+        if(savedInstanceState == null){
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, ExploreFragment.newInstance())
+                    .commit();
+        }
+*/
         listView = (ListView)findViewById(R.id.listivew);
         btn_getLocation = (Button) findViewById(R.id.getLocation);
 

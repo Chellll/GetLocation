@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.getlocation.R;
-import com.example.getlocation.service.models.api.Item_;
+import com.example.getlocation.data.models.api.Item_;
 
 import java.util.List;
 
@@ -92,7 +92,8 @@ public class ExploreListAdapter extends ArrayAdapter<Item_> {
         }
 
         if(item_.getVenue().getPhotos().getCount() > 0){
-            String prefix = item_.getVenue().getPhotos().getGroups().get(0)
+            String prefix = item_.getVenue().getPhotos().getGroups().get(0).toString();
+
         }
 
 
